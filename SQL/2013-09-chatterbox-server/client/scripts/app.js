@@ -20,7 +20,7 @@ var addMessage = function(messages) {
   }
 
   // for each message
-  $('main ul li').remove();
+  $('.message').remove();
   for (var i = 0; i < numMessages; i++) {
     // store info about the message being considered
     var current = {
@@ -128,7 +128,7 @@ $(document).ready(function(){
   // Define functionality for the username field and button
   $('.username.button').on('click', function(){
     // set the chosen username for use in sending future messages to the server
-    currentUserInfo.username = $('.userinput').val();
+    currentUserInfo.username = $('.username.input').val();
     // update the h2 element with username
     $('.username').text($('.username.input').val());
   });

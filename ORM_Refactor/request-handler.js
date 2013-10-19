@@ -1,8 +1,9 @@
 var url = require('url');
 var fs = require('fs');
 var path = require('path');
-var persistent_server = require('../../persistent_server.js')
-
+var persistent_server = require('./persistent_server.js')
+var Sequelize = require('sequelize');
+var seqMysql = require('sequelize-mysql');
 
 var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
@@ -10,6 +11,7 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
+
 var headers = defaultCorsHeaders;
 
 var serverResponse = function(response, statusCode) {
@@ -18,20 +20,23 @@ var serverResponse = function(response, statusCode) {
 };
 
 exports.grabDbMessages = grabDbMessages = function(request, response){
-  persistent_server.dbConnection.query('select * from messages', function(error, rows){
-    if (error) {
-      console.log('this is your ', error);
-      serverResponse(response, 400);
-    } else {
-      var messages = [];
-      console.log("all rows:", rows);
-      for (var i = 0; i < rows.length; i++){
-        messages.push(rows[i]);
-        console.log("a row is", rows[i]);
-      }
-      response.end(JSON.stringify(messages));
-    }
+  persistent_server.Messages.find().success(function(messages){
+    console.log('this is that', messages);
   });
+  //persistent_server.dbConnection.query('select * from messages', function(error, rows){
+    // if (error) {
+    //   console.log('this is your ', error);
+    //   serverResponse(response, 400);
+    // } else {
+    //   var messages = [];
+    //   console.log("all rows:", rows);
+    //   for (var i = 0; i < rows.length; i++){
+    //     messages.push(rows[i]);
+    //     console.log("a row is", rows[i]);
+    //   }
+    //   response.end(JSON.stringify(messages));
+  //   }
+  // });
 };
 
 var addToMessagesTable = function(request, response, obj, userid) {
@@ -50,36 +55,56 @@ var addToMessagesTable = function(request, response, obj, userid) {
 };
 
 exports.insertDbMessage = insertDbMessage = function(request, response, obj){
-  persistent_server.dbConnection.query('select userid from users where username=?', [obj.username], function(error, rows) {
-    if (error) {
-      serverResponse(response, 400);
-    } else {
-      if (rows.length === 0) {
-        persistent_server.dbConnection.query('insert into users (username) values (?)', [obj.username], function(error, rows) {
-          if (error) {
-            console.log('error here 60: ', error);
-            console.log('rows:', rows);
-            serverResponse(response, 400);
-          } else {
-            persistent_server.dbConnection.query('select userid from users where username=?', [obj.username], function(error, rows){
-              
-              if (error) {
-                console.log('error selecting username from users table after adding');
-                serverResponse(400);
-              } else {
-                console.log('rows after inserting a user and then selecting it', rows);
-                var userid = rows[0].userid;
-                addToMessagesTable(request, response, obj, userid);
-              }
-            });
-          }
-        });
-      } else {
-        var userid = rows[0].userid;
-        addToMessagesTable(request, response, obj, userid);
-      }
-    }
+  var objUser = obj.username;
+  var userid;
+  persistent_server.Users.sync().success(function(){
+    console.log('arrive');
+    var newUser = persistent_server.Users.findOrCreate({username: objUser});
+    newUser.save().success(function(user, created){
+      userid = user.id;
+      console.log('heres the userResponse:', user.id);
+    }).error(function(error){
+      console.log('this is error, ', error);
+    });
   });
+
+  persistent_server.Messages.sync().success(function(){
+    var newMessage = persistent_server.Messages.build({userid: userid, username: obj.username, message: obj.message, room: obj.room});
+    newMessage.save().success(function(){
+      console.log('success');
+    })
+  });
+  
+  // persistent_server.dbConnection.query('select userid from users where username=?', [obj.username], function(error, rows) {
+  //   if (error) {
+  //     serverResponse(response, 400);
+  //   } else {
+  //     if (rows.length === 0) {
+  //       persistent_server.dbConnection.query('insert into users (username) values (?)', [obj.username], function(error, rows) {
+  //         if (error) {
+  //           console.log('error here 60: ', error);
+  //           console.log('rows:', rows);
+  //           serverResponse(response, 400);
+  //         } else {
+  //           persistent_server.dbConnection.query('select userid from users where username=?', [obj.username], function(error, rows){
+              
+  //             if (error) {
+  //               console.log('error selecting username from users table after adding');
+  //               serverResponse(400);
+  //             } else {
+  //               console.log('rows after inserting a user and then selecting it', rows);
+  //               var userid = rows[0].userid;
+  //               addToMessagesTable(request, response, obj, userid);
+  //             }
+  //           });
+  //         }
+  //       });
+  //     } else {
+  //       var userid = rows[0].userid;
+  //       addToMessagesTable(request, response, obj, userid);
+  //     }
+  //   }
+  // });
 };
 
 exports.handleRequest = function(request, response) {
@@ -100,10 +125,12 @@ exports.handleRequest = function(request, response) {
 
   if (url_parts.pathname === '/1/classes/messages' || url_parts.pathname.slice(0,url_parts.pathname.length-1) === '/1/classes/room') {
     if (request.method === 'GET') {
+      //TODO use find
       statusCode = 200;
       response.writeHead(statusCode, headers);
       grabDbMessages(request, response);
     } else if (request.method === 'POST') {
+      //TODO use findOrCreate here
       var requestBody = '';
       request.on('data', function(data){
         requestBody += data;
@@ -118,9 +145,9 @@ exports.handleRequest = function(request, response) {
       serverResponse(response, 400);
     }
   } else {
-    fs.exists(path.resolve(__dirname,'../client' + filePath), function(exists) {
+    fs.exists(path.resolve(__dirname,'../SQL/2013-09-chatterbox-server/client' + filePath), function(exists) {
       if (exists) {
-        fs.readFile(path.resolve(__dirname,'../client' + filePath), function(error, content) {
+        fs.readFile(path.resolve(__dirname,'../SQL/2013-09-chatterbox-server/client' + filePath), function(error, content) {
           if (error) {
             serverResponse(500);
           } else {

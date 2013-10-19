@@ -1,5 +1,3 @@
-DROP DATABASE chat;
-
 CREATE DATABASE chat;
 
 USE chat;
@@ -13,13 +11,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE friendships (
-  userid integer, friend integer
+  userid integer primary key, friend integer
 );
-
-insert into messages (messageid, userid, username, message, time, room) values (1, 1, 'bob', 'what up', '20130101', 'lobby');
-
-insert into users (username) values ('sean');
-insert into users (username) values ('albert');
 
 /* You can also create more tables, if you need them... */
 
