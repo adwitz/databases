@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- external javascript -->
+    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+    <!-- internal javascript -->
+    <script src="scripts/config.js"></script>
+    <script src="scripts/app.js"></script>
+  </head>
+  <body>
+    <h1>Chat-Client</h1>
+    <h2 class="username"></h2>
+    <div class="toolbar">
+      <div><input type="button" class="refresh button" value="Refresh messages"></div>
+      <div><input type="text" class="username input" id = "name" placeholder = "Pick a username"/></div>
+      <div><input type="button" class="username button" value="Login"></div>
+      <div><input type="textbox" class="chat input" placeholder="Enter your message here"></div>
+      <div><input type="button" class="chat button" value="Submit"></div>
+      <div><input type = "textbox" class = "createRoom input" /></div>
+      <div><input type = "button" class = "createRoom button" value = "Create New Room" /></div>
+    </div>
+    <div class="main">
+      <div class = "UserNamesContainer"></div>
+      <div class="roomsContainer">
+        <div id="all">SHOW ALL ROOMS</div>
+      </div>
+      <div class="messagesContainer">
+        <ul></ul>
+      </div>
+  </body>
+</html>

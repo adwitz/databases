@@ -1,0 +1,78 @@
+body {
+    background: #eee;
+    text-align: center;
+    padding: 0 25px;
+}
+
+.main {
+    width: 500px;
+    margin: auto;
+    text-align: left;
+    background: white;
+    padding: 50px 60px;
+    border: solid #ddd;
+    border-width: 0 1px 1px 1px;
+}
+
+.main h1 {
+    margin-top: 0;
+    font-size: 35px;
+}
+
+.main ul {
+    padding-left: 20px;
+    background-color: gray;
+    margin: 10px;
+    border-radius: 5px;
+    border: 10px solid purple;
+}
+
+.main ul li{
+    margin-left: 30px;
+    line-height: 1em;
+    font-size: 2em;
+    font-weight: bold;
+    border-radius: 2px;
+    border: 1px solid red;
+}
+
+.main .error {
+    border: 1px solid red;
+    background: #FDEFF0;
+    padding: 20px;
+}
+
+.main .success {
+    margin-top: 25px;
+}
+
+.main .success code {
+    font-size: 12px;
+    color: green;
+    line-height: 13px;
+}
+
+.chatInput{
+  width: 200px;
+  height: 5em;
+  line-height: 1.5em;
+  font-size: 1.5em;
+  font-family: helvetica, verdana;
+}
+
+.toolbar{
+  position: absolute;
+  right: 20px;
+}
+
+.UserNamesContainer{
+  display: inline-block;
+  position: absolute;
+  left: 20px;
+}
+
+.friend{
+  background-color: blue;
+  font-weight: bold;
+  border: 3px dotted purple;
+}
