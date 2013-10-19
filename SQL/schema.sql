@@ -5,11 +5,11 @@ CREATE DATABASE chat;
 USE chat;
 
 CREATE TABLE messages (
-  messageid integer primary key, userid integer, username varchar(20), message varchar(10000), time datetime, room varchar(20)
+  messageid integer primary key auto_increment, userid integer, username varchar(20), message varchar(10000), time datetime, room varchar(20)
 );
 
 CREATE TABLE users (
-  userid integer primary key, username varchar(20)
+  userid integer primary key auto_increment, username varchar(20)
 );
 
 CREATE TABLE friendships (
@@ -17,6 +17,9 @@ CREATE TABLE friendships (
 );
 
 insert into messages (messageid, userid, username, message, time, room) values (1, 1, 'bob', 'what up', '20130101', 'lobby');
+
+insert into users (username) values ('sean');
+insert into users (username) values ('albert');
 
 /* You can also create more tables, if you need them... */
 
